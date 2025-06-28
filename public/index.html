@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧠 Agent Viewer</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; background: #f7f7f7; }
+    .entry { margin-bottom: 2rem; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+    pre { background: #eee; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>📄 Merged Agent Outputs</h1>
+  <div id="output">Loading...</div>
+
+  <script>
+    async function loadData() {
+      try {
+        const res = await fetch('/data');
+        const data = await res.json();
+
+        const container = document.getElementById('output');
+        container.innerHTML = ''; // Clear old
+
+        data.forEach((entry, i) => {
+          const box = document.createElement('div');
+          box.className = 'entry';
+          box.innerHTML = `
+            <h3>Agent ${i + 1}</h3>
+            <p><strong>Time:</strong> ${new Date(entry.time).toLocaleString()}</p>
+            <pre>${entry.text || '(no output)'}</pre>
+          `;
+          container.appendChild(box);
+        });
+      } catch (err) {
+        document.getElementById('output').innerText = '❌ Failed to load data.';
+        console.error(err);
+      }
+    }
+
+    loadData();
+    setInterval(loadData, 3000); // Auto-refresh every 3s
+  </script>
+</body>
+</html>
